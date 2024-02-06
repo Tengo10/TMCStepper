@@ -58,6 +58,7 @@ void TMC2300Stepper::defaults() {
 	IHOLD_IRUN_register.iholddelay = 1; // OTP
 	CHOPCONF_register.sr = 0x13008001;
 	PWMCONF_register.sr = 0xC40D1024;
+  //COOLCONF_register.sr = ???; 
   //MSLUT0_register.sr = ???;
   //MSLUT1_register.sr = ???;
   //MSLUT2_register.sr = ???;
@@ -78,6 +79,7 @@ void TMC2300Stepper::push() {
 	VACTUAL(VACTUAL_register.sr);
 	CHOPCONF(CHOPCONF_register.sr);
 	PWMCONF(PWMCONF_register.sr);
+    //COOLCONF(COOLCONF_registered.sr);
 }
 
 bool TMC2300Stepper::isEnabled() { return !enn() && toff(); }
