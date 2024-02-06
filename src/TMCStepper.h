@@ -1266,21 +1266,14 @@ class TMC2660Stepper {
 };
 
 
-class TMC2300Stepper : public TMCStepper {
+class TMC2300Stepper : public TMC2208Stepper {
 	public:
-	    TMC2300Stepper(Stream * SerialPort, float RS, uint8_t addr, uint16_t mul_pin1, uint16_t mul_pin2);
-		TMC2300Stepper(Stream * SerialPort, float RS) :
-			TMC2300Stepper(SerialPort, RS, TMC2300_SLAVE_ADDR)
-			{}
+	    //TMC2300Stepper(Stream * SerialPort, float RS, uint8_t addr, uint16_t mul_pin1, uint16_t mul_pin2);
+		TMC2300Stepper(Stream * SerialPort, float RS, uint8_t addr) :
+			TMC2208Stepper(SerialPort, RS, addr) {}
 		#if SW_CAPABLE_PLATFORM
-			TMC2300Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS) :
-				TMC2300Stepper(SW_RX_pin, SW_TX_pin, RS, TMC2300_SLAVE_ADDR)
-				{}
-
-			__attribute__((deprecated("Boolean argument has been deprecated and does nothing")))
-			TMC2300Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, bool) :
-				TMC2300Stepper(SW_RX_pin, SW_TX_pin, RS, TMC2300_SLAVE_ADDR)
-				{};
+			TMC2300Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, uint8_t addr) :
+				TMC2208Stepper(SW_RX_pin, SW_TX_pin, RS, addr) {}
 		#else
 			TMC2300Stepper(uint16_t, uint16_t, float) = delete; // Your platform does not currently support Software Serial
 		#endif
@@ -1305,7 +1298,7 @@ class TMC2300Stepper : public TMCStepper {
 		bool extcap();
 		bool shaft();
 		bool diag_step();
-		bool multistep_fit();
+		bool multistep_filt();
 		bool test_mode();
 
 		// R: IFCNT
@@ -1418,6 +1411,7 @@ class TMC2300Stepper : public TMCStepper {
 		uint16_t bytesWritten = 0;
 		float Rsense = 0.11;
 		bool CRCerror = false;
+		
 	protected:
 		INIT2300_REGISTER(GCONF)			{{.sr=0}};
 		INIT_REGISTER(SLAVECONF)			{{.sr=0}};
@@ -1427,36 +1421,4 @@ class TMC2300Stepper : public TMCStepper {
 		INIT2300_REGISTER(COOLCONF)		{{.sr=0}};
 
 		struct IFCNT_t 		{ constexpr static uint8_t address = 0x02; };
-		
-		TMC2300Stepper(Stream * SerialPort, float RS, uint8_t addr);
-		#if SW_CAPABLE_PLATFORM
-			TMC2300Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, uint8_t addr);
-		#endif
-
-		Stream * HWSerial = nullptr;
-		#if SW_CAPABLE_PLATFORM
-			SoftwareSerial * SWSerial = nullptr;
-			const uint16_t RXTX_pin = 0; // Half duplex
-		#endif
-
-		SSwitch *sswitch = nullptr;
-
-		int available();
-		void preWriteCommunication();
-		void preReadCommunication();
-		int16_t serial_read();
-		uint8_t serial_write(const uint8_t data);
-		void postWriteCommunication();
-		void postReadCommunication();
-		void write(uint8_t, uint32_t);
-		uint32_t read(uint8_t);
-		const uint8_t slave_address;
-		uint8_t calcCRC(uint8_t datagram[], uint8_t len);
-		static constexpr uint8_t  TMC2300_SYNC = 0x05,
-															TMC2300_SLAVE_ADDR = 0x00;
-		static constexpr uint8_t replyDelay = 2;
-		static constexpr uint8_t abort_window = 5;
-		static constexpr uint8_t max_retries = 2;
-
-		uint64_t _sendDatagram(uint8_t [], const uint8_t, uint16_t);
 };

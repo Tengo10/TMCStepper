@@ -12,7 +12,7 @@ struct GCONF_t {
             : 1,
             shaft : 1,
             diag_step: 1,
-            multistep_fit: 1,
+            multistep_filt: 1,
             test_mode: 1;
     };
   };
@@ -32,7 +32,7 @@ struct GSTAT_t {
 struct SLAVECONF_t {
   constexpr static uint8_t address = 0x03;
   union {
-    uint8_t sr : 12;
+    uint16_t sr : 12;
     struct {
       uint8_t : 8,
                 senddelay: 4;
@@ -84,7 +84,7 @@ struct TPOWERDOWN_t {
 
 struct TSTEP_t {
   constexpr static uint8_t address = 0x12;
-  uint8_t sr : 20;
+  uint32_t sr : 20;
 };
 
 struct VACTUAL_t {
@@ -130,25 +130,25 @@ struct MSCNT_t {
   uint16_t sr : 10;
 };
 
-struct COOLCONF_t {
-  constexpr static uint8_t address = 0x42;
-  union {
-    uint32_t sr : 16;
-    struct {
-      uint8_t semin : 4,
-                    : 1,
-              seup : 2,
-                    : 1,
-              semax : 4,
-                    : 1,
-              sedn : 2;
-      bool    seimin : 1;
-      int8_t  sgt : 7,
-                  : 1;
-      bool    sfilt : 1;
-    };
-  };
-};
+//struct COOLCONF_t {
+//  constexpr static uint8_t address = 0x42;
+//  union {
+//    uint32_t sr : 16;
+//    struct {
+//      uint8_t semin : 4,
+//                    : 1,
+//              seup : 2,
+//                    : 1,
+//              semax : 4,
+//                    : 1,
+//              sedn : 2;
+//      bool    seimin : 1;
+//      int8_t  sgt : 7,
+//                  : 1;
+//      bool    sfilt : 1;
+//    };
+//  };
+//};
 
 struct CHOPCONF_t {
   constexpr static uint8_t address = 0x6C;
@@ -201,9 +201,9 @@ struct PWMCONF_t {
               ola : 1,
               olb : 1,
               t120 : 1,
-              t150 : 1,
-              : 16;
-        uint16_t cs_actual : 5,
+              t150 : 1;
+        uint16_t : 16,
+              cs_actual : 5,
                 : 3;  
         bool : 7,
               stst : 1;

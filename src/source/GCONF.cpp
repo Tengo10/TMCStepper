@@ -104,11 +104,11 @@ void TMC2300Stepper::GCONF(uint32_t input) {
 void TMC2300Stepper::extcap(bool B)				{ SET_REG(extcap);	}
 void TMC2300Stepper::shaft(bool B) 				{ SET_REG(shaft);			}
 void TMC2300Stepper::diag_step(bool B) 			{ SET_REG(diag_step);			}
-void TMC2300Stepper::multistep_fit(bool B)		{ SET_REG(multistep_fit);	}
+void TMC2300Stepper::multistep_filt(bool B)		{ SET_REG(multistep_filt);	}
 void TMC2300Stepper::test_mode(bool B)			{ SET_REG(test_mode);	}
 
 bool TMC2300Stepper::extcap()			{ TMC2300_n::GCONF_t r{0}; r.sr = GCONF(); return r.extcap;		}
 bool TMC2300Stepper::shaft()			{ TMC2300_n::GCONF_t r{0}; r.sr = GCONF(); return r.shaft;				}
 bool TMC2300Stepper::diag_step()		{ TMC2300_n::GCONF_t r{0}; r.sr = GCONF(); return r.diag_step;				}
-bool TMC2300Stepper::multistep_fit()	{ TMC2300_n::GCONF_t r{0}; r.sr = GCONF(); return r.multistep_fit;		}
+bool TMC2300Stepper::multistep_filt()	{ TMC2300_n::GCONF_t r{0}; r.sr = GCONF(); return r.multistep_filt;		}
 bool TMC2300Stepper::test_mode()		{ TMC2300_n::GCONF_t r{0}; r.sr = GCONF(); return r.test_mode;		}

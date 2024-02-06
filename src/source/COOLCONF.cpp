@@ -68,10 +68,3 @@ uint8_t TMC2300Stepper::seup()	{ GET_REG(seup);	}
 uint8_t TMC2300Stepper::semax()	{ GET_REG(semax);	}
 uint8_t TMC2300Stepper::sedn()	{ GET_REG(sedn);	}
 bool 	TMC2300Stepper::seimin(){ GET_REG(seimin);	}
-
-int8_t TMC2300Stepper::sgt() {
-	// Two's complement in a 7bit value
-	int8_t val = (COOLCONF_register.sgt &  0x40) << 1; // Isolate sign bit
-	val |= COOLCONF_register.sgt & 0x7F;
-	return val;
-}
