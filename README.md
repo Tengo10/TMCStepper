@@ -1,3 +1,5 @@
+Experimental fork with TMC2300 support
+
 Arduino library for Trinamic TMC stepper motor drivers.
 
 Supported TMC drivers:
