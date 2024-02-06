@@ -50,6 +50,7 @@
 #include "source/TMC2208_bitfields.h"
 #include "source/TMC2209_bitfields.h"
 #include "source/TMC2660_bitfields.h"
+#include "source/TMC2300_bitfields.h"
 
 #define INIT_REGISTER(REG) REG##_t REG##_register = REG##_t
 #define INIT2130_REGISTER(REG) TMC2130_n::REG##_t REG##_register = TMC2130_n::REG##_t
@@ -59,6 +60,7 @@
 #define INIT2660_REGISTER(REG) TMC2660_n::REG##_t REG##_register = TMC2660_n::REG##_t
 #define INIT2208_REGISTER(REG) TMC2208_n::REG##_t REG##_register = TMC2208_n::REG##_t
 #define INIT2224_REGISTER(REG) TMC2224_n::REG##_t REG##_register = TMC2224_n::REG##_t
+#define INIT2300_REGISTER(REG) TMC2300_n::REG##_t REG##_register = TMC2300_n::REG##_t
 #define SET_ALIAS(TYPE, DRIVER, NEW, ARG, OLD) TYPE (DRIVER::*NEW)(ARG) = &DRIVER::OLD
 
 #define TMCSTEPPER_VERSION 0x000703 // v0.7.3
@@ -1261,4 +1263,200 @@ class TMC2660Stepper {
 		uint32_t spi_speed = 16000000/8; // Default 2MHz
 		uint8_t _savedToff = 0;
 		SW_SPIClass * TMC_SW_SPI = nullptr;
+};
+
+
+class TMC2300Stepper : public TMCStepper {
+	public:
+	    TMC2300Stepper(Stream * SerialPort, float RS, uint8_t addr, uint16_t mul_pin1, uint16_t mul_pin2);
+		TMC2300Stepper(Stream * SerialPort, float RS) :
+			TMC2300Stepper(SerialPort, RS, TMC2300_SLAVE_ADDR)
+			{}
+		#if SW_CAPABLE_PLATFORM
+			TMC2300Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS) :
+				TMC2300Stepper(SW_RX_pin, SW_TX_pin, RS, TMC2300_SLAVE_ADDR)
+				{}
+
+			__attribute__((deprecated("Boolean argument has been deprecated and does nothing")))
+			TMC2300Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, bool) :
+				TMC2300Stepper(SW_RX_pin, SW_TX_pin, RS, TMC2300_SLAVE_ADDR)
+				{};
+		#else
+			TMC2300Stepper(uint16_t, uint16_t, float) = delete; // Your platform does not currently support Software Serial
+		#endif
+		void defaults();
+		void push();
+		void begin();
+		#if SW_CAPABLE_PLATFORM
+			void beginSerial(uint32_t baudrate) __attribute__((weak));
+		#else
+			void beginSerial(uint32_t) = delete; // Your platform does not currently support Software Serial
+		#endif
+		bool isEnabled();
+
+		// RW: GCONF
+		void GCONF(uint32_t input);
+		void extcap(bool B);
+		void shaft(bool B);
+		void diag_step(bool B);
+		void multistep_filt(bool B);
+		void test_mode(bool B);
+		uint32_t GCONF();
+		bool extcap();
+		bool shaft();
+		bool diag_step();
+		bool multistep_fit();
+		bool test_mode();
+
+		// R: IFCNT
+		uint8_t IFCNT();
+
+		// W: SLAVECONF
+		void SLAVECONF(uint16_t input);
+		uint16_t SLAVECONF();
+		void senddelay(uint8_t B);
+		uint8_t senddelay();
+
+		// R: IOIN
+		uint32_t IOIN();
+		bool en();
+		bool nstdby();
+		bool ad0();
+		bool ad1();
+		bool diag();
+		bool stepper();
+		bool pdn_uart();
+		bool step();
+		bool dir();
+		bool comp_a1a2();
+		bool comp_b1b2();
+		uint8_t version();
+
+		// W: VACTUAL
+		void VACTUAL(uint32_t input);
+		uint32_t VACTUAL();
+
+		// RW: CHOPCONF
+		void CHOPCONF(uint32_t input);
+		void tbl(uint8_t B);
+		void mres(uint8_t B);
+		void intpol(bool B);
+		void dedge(bool B);
+		void diss2g(bool B);
+		void diss2vs(bool B);
+		uint32_t CHOPCONF();
+		uint8_t tbl();
+		uint8_t mres();
+		bool intpol();
+		bool dedge();
+		bool diss2g();
+		bool diss2vs();
+
+		// R: DRV_STATUS
+		uint32_t DRV_STATUS();
+		bool otpw();
+		bool ot();
+		bool s2ga();
+		bool s2gb();
+		bool s2vsa();
+		bool s2vsb();
+		bool ola();
+		bool olb();
+		bool t120();
+		bool t150();
+		uint16_t cs_actual();
+		bool stst();
+
+		// W: COOLCONF
+		void COOLCONF(uint32_t value);
+		uint32_t COOLCONF();
+		void semin(								uint8_t B);
+		void seup(								uint8_t B);
+		void semax(								uint8_t B);
+		void sedn(								uint8_t B);
+		void seimin(							bool 		B);
+		void sgt(									int8_t  B);
+		void sfilt(								bool 		B);
+		uint8_t semin();
+		uint8_t seup();
+		uint8_t semax();
+		uint8_t sedn();
+		bool seimin();
+		int8_t sgt();
+		bool sfilt();
+
+		// RW: PWMCONF
+		void PWMCONF(uint32_t input);
+		void pwm_ofs(uint8_t B);
+		void pwm_grad(uint8_t B);
+		void pwm_freq(uint8_t B);
+		void pwm_autoscale(bool B);
+		void pwm_autograd(bool B);
+		void freewheel(uint8_t B);
+		void pwm_reg(uint8_t B);
+		void pwm_lim(uint8_t B);
+		uint32_t PWMCONF();
+		uint8_t pwm_ofs();
+		uint8_t pwm_grad();
+		uint8_t pwm_freq();
+		bool pwm_autoscale();
+		bool pwm_autograd();
+		uint8_t freewheel();
+		uint8_t pwm_reg();
+		uint8_t pwm_lim();
+
+		// R: PWM_SCALE
+		uint32_t PWM_SCALE();
+		uint8_t pwm_scale_sum();
+		int16_t pwm_scale_auto();
+
+		// R: PWM_AUTO (0x72)
+		uint32_t PWM_AUTO();
+		uint8_t pwm_ofs_auto();
+		uint8_t pwm_grad_auto();
+
+		uint16_t bytesWritten = 0;
+		float Rsense = 0.11;
+		bool CRCerror = false;
+	protected:
+		INIT2300_REGISTER(GCONF)			{{.sr=0}};
+		INIT_REGISTER(SLAVECONF)			{{.sr=0}};
+		INIT2300_REGISTER(VACTUAL)		{.sr=0};
+		INIT2300_REGISTER(CHOPCONF)		{{.sr=0}};
+		INIT2300_REGISTER(PWMCONF)		{{.sr=0}};
+		INIT2300_REGISTER(COOLCONF)		{{.sr=0}};
+
+		struct IFCNT_t 		{ constexpr static uint8_t address = 0x02; };
+		
+		TMC2300Stepper(Stream * SerialPort, float RS, uint8_t addr);
+		#if SW_CAPABLE_PLATFORM
+			TMC2300Stepper(uint16_t SW_RX_pin, uint16_t SW_TX_pin, float RS, uint8_t addr);
+		#endif
+
+		Stream * HWSerial = nullptr;
+		#if SW_CAPABLE_PLATFORM
+			SoftwareSerial * SWSerial = nullptr;
+			const uint16_t RXTX_pin = 0; // Half duplex
+		#endif
+
+		SSwitch *sswitch = nullptr;
+
+		int available();
+		void preWriteCommunication();
+		void preReadCommunication();
+		int16_t serial_read();
+		uint8_t serial_write(const uint8_t data);
+		void postWriteCommunication();
+		void postReadCommunication();
+		void write(uint8_t, uint32_t);
+		uint32_t read(uint8_t);
+		const uint8_t slave_address;
+		uint8_t calcCRC(uint8_t datagram[], uint8_t len);
+		static constexpr uint8_t  TMC2300_SYNC = 0x05,
+															TMC2300_SLAVE_ADDR = 0x00;
+		static constexpr uint8_t replyDelay = 2;
+		static constexpr uint8_t abort_window = 5;
+		static constexpr uint8_t max_retries = 2;
+
+		uint64_t _sendDatagram(uint8_t [], const uint8_t, uint16_t);
 };
